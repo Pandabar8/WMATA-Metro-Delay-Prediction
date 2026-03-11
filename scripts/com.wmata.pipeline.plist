@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.wmata.pipeline</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>cd "/Users/andresbarrientos/Desktop/Master/U of Maryland/Spring 26/ENAI_603/WMATA_Delays_Project/scripts" &amp;&amp; "/Users/andresbarrientos/Desktop/Master/U of Maryland/Spring 26/ENAI_603/venv/bin/python3" collect_all.py</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>120</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/wmata_pipeline.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/wmata_pipeline_error.log</string>
+</dict>
+</plist>
