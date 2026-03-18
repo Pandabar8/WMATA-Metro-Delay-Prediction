@@ -1,13 +1,15 @@
-# WMATA Pipeline — fill in your API keys before running `crontab deploy/crontab.txt`
+# WMATA Pipeline — fill in your API keys before running:
+#   crontab ~/WMATA_Delays_Project/deploy/crontab.txt
+HOME=/home/ubuntu
 WMATA_API_KEY=your_wmata_key_here
 SENDGRID_API_KEY=your_sendgrid_key_here
 ALERT_EMAIL=andresb@umd.edu
 
 # Collect data every 2 minutes
-*/2 * * * * cd ~/WMATA_Delays_Project && .venv/bin/python scripts/collect_all.py >> logs/pipeline.log 2>&1
+*/2 * * * * cd $HOME/WMATA_Delays_Project && .venv/bin/python scripts/collect_all.py >> $HOME/WMATA_Delays_Project/logs/pipeline.log 2>&1
 
 # Monitor pipeline every 10 minutes
-*/10 * * * * cd ~/WMATA_Delays_Project && .venv/bin/python scripts/monitor.py >> logs/monitor.log 2>&1
+*/10 * * * * cd $HOME/WMATA_Delays_Project && .venv/bin/python scripts/monitor.py >> $HOME/WMATA_Delays_Project/logs/monitor.log 2>&1
 
 # Daily summary at 8:00 AM UTC
-0 8 * * * cd ~/WMATA_Delays_Project && .venv/bin/python scripts/daily_summary.py >> logs/monitor.log 2>&1
+0 8 * * * cd $HOME/WMATA_Delays_Project && .venv/bin/python scripts/daily_summary.py >> $HOME/WMATA_Delays_Project/logs/monitor.log 2>&1

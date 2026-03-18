@@ -18,8 +18,8 @@ if [ -d "$PROJECT_DIR" ]; then
     cd "$PROJECT_DIR" && git pull
 else
     git clone "$REPO_URL" "$PROJECT_DIR"
-    cd "$PROJECT_DIR"
 fi
+cd "$PROJECT_DIR"
 
 echo "=== 4. Creating Python virtual environment ==="
 python3 -m venv .venv
@@ -55,7 +55,7 @@ echo ""
 read -p "Press Enter once you've updated deploy/crontab.txt..."
 
 echo "=== 8. Installing crontab ==="
-crontab deploy/crontab.txt
+crontab "$PROJECT_DIR/deploy/crontab.txt"
 echo "Crontab installed. Verifying:"
 crontab -l
 
