@@ -33,7 +33,7 @@ def test_format_summary_no_data():
         "prev_rows": 0,
     }
     body = format_summary(stats)
-    assert "Sin datos" in body or "0" in body
+    assert "Sin datos" in body
 
 
 def test_compute_delta_positive():

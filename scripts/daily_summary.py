@@ -17,6 +17,7 @@ from email_utils import send_email
 LINE_NAMES = {
     "RD": "Red Line", "BL": "Blue Line", "OR": "Orange Line",
     "SV": "Silver Line", "GR": "Green Line", "YL": "Yellow Line",
+    "--": "All Lines",
 }
 
 def _readable_lines(raw: str) -> str:
@@ -25,6 +26,13 @@ def _readable_lines(raw: str) -> str:
         return raw
     codes = [c.strip().rstrip(";") for c in raw.split(";") if c.strip().rstrip(";")]
     return ", ".join(LINE_NAMES.get(c, c) for c in codes)
+
+
+def _fmt_time(ts: str) -> str | None:
+    """Format ISO timestamp to 12-hour time string, or None if ts is falsy."""
+    if not ts:
+        return None
+    return datetime.fromisoformat(ts).strftime("%I:%M %p")
 
 
 def get_yesterday() -> str:
@@ -46,11 +54,6 @@ def query_stats(date: str) -> dict:
         """, (date,)).fetchone()
         total_rows, cycles, first_cycle, last_cycle = row
 
-        def fmt(ts):
-            if not ts:
-                return None
-            return datetime.fromisoformat(ts).strftime("%I:%M %p")
-
         incident_rows = conn.execute("""
             SELECT lines_affected, COUNT(*) as cnt
             FROM incidents
@@ -69,8 +72,8 @@ def query_stats(date: str) -> dict:
         "date": date,
         "total_rows": total_rows,
         "cycles": cycles,
-        "first_cycle": fmt(first_cycle),
-        "last_cycle": fmt(last_cycle),
+        "first_cycle": _fmt_time(first_cycle),
+        "last_cycle": _fmt_time(last_cycle),
         "incidents": incidents,
         "prev_rows": prev_rows,
     }
@@ -110,6 +113,8 @@ def format_summary(stats: dict) -> str:
     if pct is not None:
         sign = "+" if delta >= 0 else ""
         lines += [f"Comparación vs ayer: {sign}{delta:,} ({sign}{pct}%)", ""]
+    else:
+        lines += ["Comparación vs ayer: sin datos del día anterior", ""]
 
     if incidents:
         lines.append(f"Incidentes detectados: {sum(c for _, c in incidents)}")
