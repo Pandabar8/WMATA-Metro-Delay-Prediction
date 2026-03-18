@@ -62,16 +62,17 @@ def build_alert_subject(new_state: dict, old_state: dict) -> str:
 
 
 def build_alert_body(new_state: dict, old_state: dict) -> str:
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(timezone.utc)
+    now_str = now.strftime("%Y-%m-%d %H:%M UTC")
     if new_state["status"] == "ok":
         start = datetime.fromisoformat(old_state["since"])
-        duration = datetime.now(timezone.utc) - start
+        duration = now - start
         mins = int(duration.total_seconds() / 60)
-        return f"Pipeline recovered at {now}.\nOutage duration: {mins} minutes."
+        return f"Pipeline recovered at {now_str}.\nOutage duration: {mins} minutes."
     else:
         return (
             f"No data collected in the last {WINDOW_MINUTES} minutes.\n\n"
-            f"Detected at: {now}\n"
+            f"Detected at: {now_str}\n"
             f"Check: /tmp/wmata_pipeline_error.log on the collection host."
         )
 
@@ -84,11 +85,10 @@ def check_pipeline() -> dict:
     cutoff = (now - timedelta(minutes=WINDOW_MINUTES)).isoformat()
 
     try:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("SELECT COUNT(*) FROM predictions WHERE collected_at >= ?", (cutoff,))
-        count = c.fetchone()[0]
-        conn.close()
+        with sqlite3.connect(DB_PATH) as conn:
+            count = conn.execute(
+                "SELECT COUNT(*) FROM predictions WHERE collected_at >= ?", (cutoff,)
+            ).fetchone()[0]
     except Exception as e:
         print(f"[monitor] DB error: {e}")
         return {"status": "failing", "since": now.isoformat(), "last_alert": None}
