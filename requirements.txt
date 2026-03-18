@@ -9,5 +9,4 @@ seaborn>=0.12
 shap>=0.43
 jupyter>=1.0
 notebook>=7.0
-sendgrid>=6.9
 pytest>=7.0

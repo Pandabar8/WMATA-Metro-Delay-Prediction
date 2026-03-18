@@ -2,7 +2,8 @@
 #   crontab ~/WMATA_Delays_Project/deploy/crontab.txt
 HOME=/home/ubuntu
 WMATA_API_KEY=your_wmata_key_here
-SENDGRID_API_KEY=your_sendgrid_key_here
+GMAIL_APP_PASSWORD=your_gmail_app_password_here
+GMAIL_SENDER=pandabar272@gmail.com
 ALERT_EMAIL=andresb@umd.edu
 
 # Collect data every 2 minutes
