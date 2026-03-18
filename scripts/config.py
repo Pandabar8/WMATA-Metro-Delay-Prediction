@@ -27,3 +27,8 @@ DELAY_THRESHOLD_MINUTES = 2
 # ─── Collection Settings ────────────────────────────────────
 PREDICTION_INTERVAL_SECONDS = 120  # Poll every 2 minutes
 INCIDENT_INTERVAL_SECONDS = 300    # Poll incidents every 5 minutes
+
+# ─── Monitoring ─────────────────────────────────────────────
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
+ALERT_EMAIL = os.environ.get("ALERT_EMAIL", "andresb@umd.edu")
+STATE_FILE = os.path.join(DATA_DIR, "monitor_state.json")
