@@ -20,6 +20,10 @@ def send_email(subject: str, body: str, to: str = ALERT_EMAIL) -> bool:
         print("ERROR: SENDGRID_API_KEY not set — cannot send email")
         return False
 
+    if not to:
+        print("ERROR: recipient email is empty — cannot send email")
+        return False
+
     message = Mail(
         from_email=ALERT_EMAIL,
         to_emails=to,
@@ -33,5 +37,5 @@ def send_email(subject: str, body: str, to: str = ALERT_EMAIL) -> bool:
         print(f"Email sent: '{subject}' → {to} (status {response.status_code})")
         return True
     except Exception as e:
-        print(f"Email failed: {e}")
+        print(f"Email failed: {type(e).__name__}: {e}")
         return False
