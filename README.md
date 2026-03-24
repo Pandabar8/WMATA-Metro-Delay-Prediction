@@ -42,6 +42,8 @@ WMATA_Delays_Project/
 │   ├── 01_data_audit.ipynb          # Data validation & quality checks
 │   ├── 02_eda.ipynb                 # Exploratory data analysis
 │   └── 03_baseline_model.ipynb      # Baseline models (Dummy, LR, RF)
+│   └── 20_feature_engineering.ipynb # Further feature engineering
+│   └── 21_data_visualization.ipynb  # Map visualizations of WMATA Rail System 
 ├── data/                            # All data artifacts
 │   ├── wmata.db                     # SQLite database (primary store)
 │   ├── gtfs_rail/                   # Archived GTFS schedule files
