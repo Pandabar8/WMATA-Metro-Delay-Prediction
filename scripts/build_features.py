@@ -3,8 +3,9 @@ Feature Engineering for WMATA Metro Delay Prediction
 ENAI 603 — Builds a modeling-ready dataset from raw predictions + incidents.
 
 Delay label: headway-based. A train is "delayed" if the observed headway
-at (station, line, direction) exceeds the median headway for that group
-by more than DELAY_THRESHOLD_MINUTES.
+at (station, line, direction, hour) exceeds the median headway for that group
+by more than DELAY_THRESHOLD_MINUTES. Gaps exceeding 2x the median are
+treated as missed arrivals (phantom gaps) rather than true delays.
 
 Usage:
     python scripts/build_features.py
@@ -127,6 +128,8 @@ def compute_delay_labels(df: pd.DataFrame) -> pd.DataFrame:
     arrivals = arrivals.sort_values(
         ["location_code", "line", "group_num", "collected_at"]
     )
+    arrivals["_hour"] = arrivals["collected_at"].dt.tz_convert("US/Eastern").dt.hour
+
     arrivals["prev_arrival"] = arrivals.groupby(
         ["location_code", "line", "group_num"]
     )["collected_at"].shift(1)
@@ -134,22 +137,28 @@ def compute_delay_labels(df: pd.DataFrame) -> pd.DataFrame:
         arrivals["collected_at"] - arrivals["prev_arrival"]
     ).dt.total_seconds()
 
-    # Median headway per group
+    # Median headway per (station, line, direction, hour) so each time
+    # window is compared against itself, not a global average.
+    group_keys = ["location_code", "line", "group_num", "_hour"]
     group_medians = (
         arrivals.dropna(subset=["observed_headway_sec"])
-        .groupby(["location_code", "line", "group_num"])["observed_headway_sec"]
+        .groupby(group_keys)["observed_headway_sec"]
         .median()
         .reset_index()
         .rename(columns={"observed_headway_sec": "median_headway_sec"})
     )
 
-    arrivals = arrivals.merge(
-        group_medians, on=["location_code", "line", "group_num"], how="left"
-    )
+    arrivals = arrivals.merge(group_medians, on=group_keys, how="left")
+
+    # Phantom gap filter: if observed headway > 2x the median, a train
+    # likely arrived and left between two polling cycles (every 2 min).
+    # These are missed arrivals, not real delays.
+    is_phantom = arrivals["observed_headway_sec"] > 2 * arrivals["median_headway_sec"]
 
     threshold_sec = DELAY_THRESHOLD_MINUTES * 60
     arrivals["is_delayed"] = (
-        arrivals["observed_headway_sec"] > arrivals["median_headway_sec"] + threshold_sec
+        (arrivals["observed_headway_sec"] > arrivals["median_headway_sec"] + threshold_sec)
+        & ~is_phantom
     ).astype(float).fillna(0).astype(int)
 
     # Propagate delay labels to all rows via merge_asof (forward-looking)
