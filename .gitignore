@@ -11,3 +11,6 @@ data/wmata.db
 data/gtfs_rail.zip
 data/*.csv
 data/*.log
+# ...except incidents.csv, which is small (~6 MB) and lets collaborators
+# run the event-study notebook without needing the full DB.
+!data/incidents.csv
