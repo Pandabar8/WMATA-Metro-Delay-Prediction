@@ -1,14 +1,15 @@
 venv/
 docs/superpowers/
 .claude/
+.idea/
 __pycache__/
 *.pyc
 .env
 .DS_Store
 
-# Data — exclude large DB and zip, keep GTFS text files and features
+# Data — exclude large DB, zips, and exports
 data/wmata.db
-data/gtfs_rail.zip
+data/*.zip
 data/*.csv
 data/*.log
 # ...except incidents.csv, which is small (~6 MB) and lets collaborators
