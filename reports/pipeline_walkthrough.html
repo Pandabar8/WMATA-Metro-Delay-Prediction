@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WMATA Pipeline — Visual Walkthrough</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --panel: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e5e5e0;
+    --accent: #c0392b;
+    --collect: #2c5f8d;
+    --store: #5a7a3a;
+    --transform: #8d6e2c;
+    --model: #6d3a8d;
+    --code-bg: #f4f3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+  header {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 28px;
+    margin-bottom: 48px;
+  }
+  header .eyebrow {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 34px;
+    margin: 0 0 8px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    color: var(--muted);
+    margin: 4px 0 0;
+    font-size: 15px;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 56px 0 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+  }
+  h3 {
+    font-size: 16px;
+    margin: 28px 0 10px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  p { margin: 0 0 14px; }
+  .lede {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 48px;
+    font-size: 14px;
+  }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+
+  /* Card */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 16px 0 24px;
+  }
+
+  /* Code */
+  code, pre {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+  }
+  code.inline {
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12.5px;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 14px 18px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 8px 0 16px;
+    line-height: 1.5;
+  }
+
+  /* Tag/badge */
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: white;
+  }
+  .tag.collect { background: var(--collect); }
+  .tag.store { background: var(--store); }
+  .tag.transform { background: var(--transform); }
+  .tag.model { background: var(--model); }
+
+  /* Tables */
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 8px 0 16px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; background: var(--code-bg); }
+  td code { font-size: 12.5px; }
+
+  /* Architecture diagram */
+  .arch {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 16px 0 32px;
+  }
+
+  /* Flow row of boxes */
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+  .flow-box {
+    flex: 1 1 0;
+    min-width: 140px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-align: center;
+    font-size: 13px;
+    margin: 6px;
+  }
+  .flow-box .lbl {
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .flow-box .val {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .flow-box .sub {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .flow-box.collect { border-top: 3px solid var(--collect); }
+  .flow-box.store { border-top: 3px solid var(--store); }
+  .flow-box.transform { border-top: 3px solid var(--transform); }
+  .flow-box.model { border-top: 3px solid var(--model); }
+
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 18px;
+    padding: 0 4px;
+  }
+
+  /* Two-column layout */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 12px 0 24px;
+  }
+  @media (max-width: 720px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .wrap { padding: 32px 20px 56px; }
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 16px 0 24px;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .stat .num { font-size: 22px; font-weight: 600; color: var(--accent); }
+  .stat .lbl { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+  @media (max-width: 720px) {
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .callout {
+    background: #fef9f2;
+    border-left: 3px solid var(--transform);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .callout strong { color: var(--transform); }
+
+  .why {
+    background: #f4f8f2;
+    border-left: 3px solid var(--store);
+    padding: 14px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .why strong { color: var(--store); }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 32px 0;
+  }
+
+  ul.tight { margin: 0 0 14px; padding-left: 22px; }
+  ul.tight li { margin: 4px 0; }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin: 0 0 16px;
+    flex-wrap: wrap;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .legend .swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">ENAI 603 · Spring 2026 · Visual study guide</div>
+  <h1>WMATA Pipeline Walkthrough</h1>
+  <p>From WMATA's API to a 10M-row modeling dataset, in seven layers.</p>
+</header>
+
+<div class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#overview">The whole pipeline at a glance</a></li>
+    <li><a href="#config">Layer 1 · Configuration</a></li>
+    <li><a href="#collect">Layer 2 · Collection (3 API endpoints)</a></li>
+    <li><a href="#store">Layer 3 · Storage (SQLite, 3 tables)</a></li>
+    <li><a href="#orchestrate">Layer 4 · Orchestration (cron on a VM)</a></li>
+    <li><a href="#sync">Layer 5 · Sync (VM → local)</a></li>
+    <li><a href="#features">Layer 6 · Feature engineering</a></li>
+    <li><a href="#labels">Layer 7 · The headway-based delay label (the clever part)</a></li>
+  </ol>
+</div>
+
+<!-- ════════ OVERVIEW ════════ -->
+<h2 id="overview">1. The whole pipeline at a glance</h2>
+<p class="lede">Three API endpoints feed three SQLite tables on a remote VM. A daily sync brings the data to your laptop, where a feature builder turns 10M raw rows into a clean, labeled CSV ready for modeling.</p>
+
+<div class="legend">
+  <span><span class="swatch" style="background:var(--collect)"></span>Collect</span>
+  <span><span class="swatch" style="background:var(--store)"></span>Store</span>
+  <span><span class="swatch" style="background:var(--transform)"></span>Transform</span>
+  <span><span class="swatch" style="background:var(--model)"></span>Model</span>
+</div>
+
+<div class="arch">
+<svg viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:-apple-system,sans-serif;font-size:12px">
+  <!-- WMATA API cluster -->
+  <rect x="20" y="20" width="180" height="200" rx="8" fill="none" stroke="#c0392b" stroke-dasharray="4 3"/>
+  <text x="110" y="40" text-anchor="middle" font-weight="600" fill="#c0392b" font-size="11">WMATA API</text>
+
+  <rect x="40" y="55" width="140" height="40" rx="5" fill="#2c5f8d"/>
+  <text x="110" y="73" text-anchor="middle" fill="white" font-weight="600">Predictions</text>
+  <text x="110" y="87" text-anchor="middle" fill="white" font-size="10">every 2 min</text>
+
+  <rect x="40" y="105" width="140" height="40" rx="5" fill="#2c5f8d"/>
+  <text x="110" y="123" text-anchor="middle" fill="white" font-weight="600">Incidents</text>
+  <text x="110" y="137" text-anchor="middle" fill="white" font-size="10">every 5 min</text>
+
+  <rect x="40" y="155" width="140" height="40" rx="5" fill="#2c5f8d"/>
+  <text x="110" y="173" text-anchor="middle" fill="white" font-weight="600">Stations</text>
+  <text x="110" y="187" text-anchor="middle" fill="white" font-size="10">one-time pull</text>
+
+  <!-- Arrow -->
+  <path d="M 200 120 L 250 120" stroke="#888" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+  <!-- VM -->
+  <rect x="260" y="40" width="220" height="160" rx="8" fill="none" stroke="#999" stroke-dasharray="4 3"/>
+  <text x="370" y="60" text-anchor="middle" font-weight="600" fill="#666" font-size="11">Oracle Cloud VM</text>
+
+  <rect x="280" y="75" width="180" height="35" rx="5" fill="#fff" stroke="#5a7a3a" stroke-width="2"/>
+  <text x="370" y="97" text-anchor="middle" font-weight="600">cron → collect_all.py</text>
+
+  <rect x="280" y="125" width="180" height="55" rx="5" fill="#5a7a3a"/>
+  <text x="370" y="148" text-anchor="middle" fill="white" font-weight="600">wmata.db (SQLite)</text>
+  <text x="370" y="165" text-anchor="middle" fill="white" font-size="10">predictions · incidents · stations</text>
+
+  <!-- Arrow to local -->
+  <path d="M 480 130 L 540 130" stroke="#888" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="510" y="123" text-anchor="middle" font-size="10" fill="#666">daily sync</text>
+
+  <!-- Local -->
+  <rect x="550" y="40" width="220" height="160" rx="8" fill="none" stroke="#999" stroke-dasharray="4 3"/>
+  <text x="660" y="60" text-anchor="middle" font-weight="600" fill="#666" font-size="11">Local laptop</text>
+
+  <rect x="570" y="75" width="180" height="35" rx="5" fill="#fff" stroke="#5a7a3a" stroke-width="2"/>
+  <text x="660" y="97" text-anchor="middle" font-weight="600">merge_db.py</text>
+
+  <rect x="570" y="125" width="180" height="55" rx="5" fill="#5a7a3a"/>
+  <text x="660" y="148" text-anchor="middle" fill="white" font-weight="600">wmata.db (local)</text>
+  <text x="660" y="165" text-anchor="middle" fill="white" font-size="10">~10M predictions</text>
+
+  <!-- Arrow to features -->
+  <path d="M 770 130 L 830 130" stroke="#888" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Features -->
+  <rect x="840" y="100" width="140" height="100" rx="8" fill="#8d6e2c"/>
+  <text x="910" y="125" text-anchor="middle" fill="white" font-weight="600">build_features.py</text>
+  <text x="910" y="145" text-anchor="middle" fill="white" font-size="10">delay labels</text>
+  <text x="910" y="160" text-anchor="middle" fill="white" font-size="10">+ 18 features</text>
+  <text x="910" y="180" text-anchor="middle" fill="white" font-size="10">→ features.csv</text>
+
+  <!-- Down arrow -->
+  <path d="M 910 200 L 910 250" stroke="#888" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Notebook -->
+  <rect x="780" y="260" width="200" height="80" rx="8" fill="#6d3a8d"/>
+  <text x="880" y="288" text-anchor="middle" fill="white" font-weight="600">notebooks</text>
+  <text x="880" y="307" text-anchor="middle" fill="white" font-size="10">EDA · baseline · CatBoost</text>
+  <text x="880" y="325" text-anchor="middle" fill="white" font-size="10">target: AUC-ROC &gt; 0.80</text>
+
+  <!-- Arrow defs -->
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 z" fill="#888"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+
+<div class="stat-row">
+  <div class="stat"><div class="num">~10M</div><div class="lbl">prediction rows</div></div>
+  <div class="stat"><div class="num">13.5K</div><div class="lbl">incident rows</div></div>
+  <div class="stat"><div class="num">5 wks</div><div class="lbl">collection span</div></div>
+  <div class="stat"><div class="num">20.7%</div><div class="lbl">delay rate</div></div>
+</div>
+
+<!-- ════════ CONFIG ════════ -->
+<h2 id="config">2. Layer 1 · Configuration</h2>
+<p>Everything the pipeline needs is centralized in <code class="inline">scripts/config.py</code>: API key, endpoint URLs, polling intervals, the database path, and the delay threshold.</p>
+
+<div class="card">
+  <h3>What's set here</h3>
+  <table>
+    <tr><th>Setting</th><th>Value</th><th>Why it matters</th></tr>
+    <tr><td><code>WMATA_API_KEY</code></td><td>env var</td><td>Required header on every request</td></tr>
+    <tr><td><code>PREDICTION_INTERVAL_SECONDS</code></td><td><strong>120</strong></td><td>Faster polling = better train tracking, but rate limits</td></tr>
+    <tr><td><code>INCIDENT_INTERVAL_SECONDS</code></td><td><strong>300</strong></td><td>Incidents change slowly; no need to hammer the endpoint</td></tr>
+    <tr><td><code>DELAY_THRESHOLD_MINUTES</code></td><td><strong>2</strong></td><td>How much over expected headway counts as "delayed"</td></tr>
+    <tr><td><code>DB_PATH</code></td><td><code>data/wmata.db</code></td><td>Single SQLite file holds the whole project</td></tr>
+  </table>
+  <div class="why"><strong>Why this design:</strong> One config file means changing the polling rate or delay threshold is a one-line edit. No magic numbers scattered through the codebase.</div>
+</div>
+
+<!-- ════════ COLLECT ════════ -->
+<h2 id="collect">3. Layer 2 · Collection</h2>
+<p>Three independent collectors, each one focused on a single endpoint. They all follow the same shape: <strong>fetch → tag with timestamp → insert into SQLite</strong>.</p>
+
+<div class="flow">
+  <div class="flow-box collect">
+    <div class="lbl">collect_predictions.py</div>
+    <div class="val">Predictions</div>
+    <div class="sub">~200-300 trains per call<br>every 2 min</div>
+  </div>
+  <div class="arrow">+</div>
+  <div class="flow-box collect">
+    <div class="lbl">collect_incidents.py</div>
+    <div class="val">Incidents</div>
+    <div class="sub">active alerts<br>every 5 min</div>
+  </div>
+  <div class="arrow">+</div>
+  <div class="flow-box collect">
+    <div class="lbl">collect_stations.py</div>
+    <div class="val">Stations</div>
+    <div class="sub">102 stations<br>once per startup</div>
+  </div>
+</div>
+
+<h3>The pattern (all three look like this)</h3>
+<pre>def collect_once():
+    trains = fetch_predictions()       # GET request with api_key header
+    count  = store_predictions(trains) # tag with UTC timestamp, INSERT
+    return count</pre>
+
+<div class="callout">
+<strong>Key trick:</strong> every row gets a <code>collected_at</code> timestamp in UTC. This is what lets you reconstruct what the API said at any moment in the past — the foundation for computing observed headways later.
+</div>
+
+<!-- ════════ STORE ════════ -->
+<h2 id="store">4. Layer 3 · Storage</h2>
+<p>SQLite. One file (<code class="inline">data/wmata.db</code>), three tables. Indexes on <code class="inline">collected_at</code>, <code class="inline">line</code>, and <code class="inline">location_code</code> keep queries fast even at 10M rows.</p>
+
+<div class="grid2">
+  <div class="card">
+    <h3><span class="tag store">predictions</span></h3>
+    <p style="font-size:13px;color:var(--muted)">One row per (train, station, poll). Append-only.</p>
+<pre>id INTEGER PK
+collected_at TEXT      ← UTC timestamp
+car TEXT               ← 6 or 8
+destination_code TEXT
+destination_name TEXT
+group_num TEXT         ← 1 or 2 = direction
+line TEXT              ← RD, BL, OR, SV, GR, YL
+location_code TEXT     ← station id
+location_name TEXT
+minutes TEXT           ← "5", "ARR", "BRD", "---"</pre>
+  </div>
+
+  <div class="card">
+    <h3><span class="tag store">incidents</span></h3>
+    <p style="font-size:13px;color:var(--muted)">One row per (incident, poll). Same incident appears repeatedly while active.</p>
+<pre>id INTEGER PK
+collected_at TEXT
+incident_id TEXT
+incident_type TEXT     ← "Delay" or "Alert"
+description TEXT
+lines_affected TEXT    ← "RD;BL"
+date_updated TEXT</pre>
+  </div>
+</div>
+
+<div class="card">
+  <h3><span class="tag store">stations</span></h3>
+  <p style="font-size:13px;color:var(--muted)">102 rows. Pulled once. Provides geographic + line-membership context.</p>
+<pre>station_code TEXT PK
+station_name TEXT
+lat, lon REAL
+line_code1..4 TEXT     ← lines serving this station (some serve up to 4)
+together_station TEXT  ← code of paired station (transfer points)</pre>
+</div>
+
+<div class="why"><strong>Why SQLite over Postgres:</strong> single file, zero ops, easy to copy between machines, plenty fast for 10M rows on a laptop. The right tool for a project that ships, not a system that scales.</div>
+
+<!-- ════════ ORCHESTRATE ════════ -->
+<h2 id="orchestrate">5. Layer 4 · Orchestration</h2>
+<p>There are <strong>two</strong> ways the pipeline can run, and the project uses both at different times.</p>
+
+<div class="grid2">
+  <div class="card">
+    <h3>Continuous loop · <code class="inline">run_pipeline.py</code></h3>
+    <p>One process that sleeps 1 second at a time and fires each collector when its interval has elapsed. Used for local testing.</p>
+<pre>while running:
+  if elapsed >= 120s: collect_predictions()
+  if elapsed >= 300s: collect_incidents()
+  time.sleep(1)</pre>
+    <p style="font-size:13px;color:var(--muted)">Catches SIGINT/SIGTERM for clean shutdown. Prints stats every 10 min.</p>
+  </div>
+
+  <div class="card">
+    <h3>Per-cycle script · <code class="inline">collect_all.py</code></h3>
+    <p>One short-lived process per cycle. Cron fires it every 2 min on the Oracle Cloud VM. This is what actually ran for 5 weeks straight.</p>
+<pre># crontab on VM
+*/2 * * * * cd /path && python collect_all.py</pre>
+    <p style="font-size:13px;color:var(--muted)">Simpler operationally: if it crashes, cron just fires it again two minutes later. No long-running process to babysit.</p>
+  </div>
+</div>
+
+<div class="callout">
+<strong>The trade-off:</strong> the continuous loop is more efficient (one DB connection, fewer process startups). Cron is more robust (no babysitting, no memory leaks, automatic restart on failure). For a 5-week unattended run on a free-tier VM, robustness wins.
+</div>
+
+<!-- ════════ SYNC ════════ -->
+<h2 id="sync">6. Layer 5 · Sync (VM → local)</h2>
+<p>Data is written on the VM. Modeling happens on your laptop. <code class="inline">merge_db.py</code> bridges the two without overwriting historical rows.</p>
+
+<div class="flow">
+  <div class="flow-box store">
+    <div class="lbl">remote</div>
+    <div class="val">VM wmata.db</div>
+    <div class="sub">growing each cycle</div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform">
+    <div class="lbl">scp / rsync</div>
+    <div class="val">copy to laptop</div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform">
+    <div class="lbl">merge_db.py</div>
+    <div class="val">INSERT new rows only</div>
+    <div class="sub">dedupe by (collected_at, ...)</div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="flow-box store">
+    <div class="lbl">local</div>
+    <div class="val">wmata.db (master)</div>
+    <div class="sub">never overwritten</div>
+  </div>
+</div>
+
+<div class="why"><strong>Why merge instead of overwrite:</strong> if you ever ran the local pipeline (e.g., during testing), or if a VM sync fetched a partial snapshot, overwriting would lose data. Merging by row content is safe.</div>
+
+<!-- ════════ FEATURES ════════ -->
+<h2 id="features">7. Layer 6 · Feature engineering</h2>
+<p>This is where the raw API rows become a modeling dataset. <code class="inline">build_features.py</code> runs five stages in sequence.</p>
+
+<div class="flow">
+  <div class="flow-box transform">
+    <div class="lbl">stage 1</div>
+    <div class="val">Load &amp; clean</div>
+    <div class="sub">parse minutes, drop "---", filter to 6 valid lines</div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform">
+    <div class="lbl">stage 2</div>
+    <div class="val">Label delays</div>
+    <div class="sub">headway-based<br>(see Layer 7)</div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform">
+    <div class="lbl">stage 3</div>
+    <div class="val">Add features</div>
+    <div class="sub">temporal · station · realtime · rolling</div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform">
+    <div class="lbl">stage 4</div>
+    <div class="val">Join incidents</div>
+    <div class="sub">merge_asof within ±5 min</div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform">
+    <div class="lbl">stage 5</div>
+    <div class="val">Save CSV</div>
+    <div class="sub">→ data/features.csv</div>
+  </div>
+</div>
+
+<h3>Final feature set (18 features + label)</h3>
+<table>
+  <tr><th>Group</th><th>Features</th><th>Source</th></tr>
+  <tr>
+    <td><strong>Temporal</strong></td>
+    <td><code>hour</code>, <code>day_of_week</code>, <code>is_weekend</code>, <code>is_rush_hour</code></td>
+    <td>derived from <code>collected_at</code> (US/Eastern)</td>
+  </tr>
+  <tr>
+    <td><strong>Identity</strong></td>
+    <td><code>line</code>, <code>location_code</code></td>
+    <td>raw prediction row</td>
+  </tr>
+  <tr>
+    <td><strong>Station</strong></td>
+    <td><code>num_lines</code>, <code>is_terminal</code>, <code>lat</code>, <code>lon</code></td>
+    <td>joined from <code>stations</code> table + hardcoded terminal list</td>
+  </tr>
+  <tr>
+    <td><strong>Realtime</strong></td>
+    <td><code>minutes_num</code>, <code>num_trains_at_station</code>, <code>avg_cars_at_station</code></td>
+    <td>computed per polling cycle</td>
+  </tr>
+  <tr>
+    <td><strong>Rolling</strong></td>
+    <td><code>delay_rate_30min</code>, <code>line_delay_rate_30min</code></td>
+    <td>30-min rolling window per station / per line</td>
+  </tr>
+  <tr>
+    <td><strong>Incidents</strong></td>
+    <td><code>active_incident</code>, <code>incident_is_delay</code></td>
+    <td>nearest incident per (line, time) within ±5 min</td>
+  </tr>
+  <tr>
+    <td><strong>Schedule</strong></td>
+    <td><code>scheduled_headway_min</code></td>
+    <td>median headway from GTFS static feed</td>
+  </tr>
+  <tr style="background:#fef9f2">
+    <td><strong>Label</strong></td>
+    <td><code>is_delayed</code> (0/1)</td>
+    <td>computed in Layer 7 ↓</td>
+  </tr>
+</table>
+
+<!-- ════════ LABELS ════════ -->
+<h2 id="labels">8. Layer 7 · The headway-based delay label</h2>
+<p class="lede">This is the most consequential 50 lines in the entire codebase. The WMATA API returns <em>time-to-arrival</em>, not delay, so the project had to invent its own definition.</p>
+
+<h3>The four-step recipe</h3>
+
+<div class="card">
+  <h3 style="margin-top:0">Step 1 · Detect arrivals</h3>
+  <p>A train has "arrived" when its <code class="inline">minutes</code> field becomes <code class="inline">"ARR"</code> or <code class="inline">"BRD"</code> (boarding). Mark every such row.</p>
+<pre>df["is_arrival"] = df["minutes"].isin(["ARR", "BRD"])</pre>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Step 2 · Compute observed headway</h3>
+  <p>For each (station, line, direction), look at consecutive arrivals and measure the gap.</p>
+<pre>arrivals["prev_arrival"] = arrivals.groupby(
+    ["location_code", "line", "group_num"]
+)["collected_at"].shift(1)
+
+arrivals["observed_headway_sec"] = (
+    arrivals["collected_at"] - arrivals["prev_arrival"]
+).dt.total_seconds()</pre>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Step 3 · Compute the median headway <em>per hour</em></h3>
+  <p>The median is grouped by <strong>(station, line, direction, hour)</strong>. Each window is compared against itself, not a global average.</p>
+<pre>group_keys = ["location_code", "line", "group_num", "_hour"]
+
+group_medians = (
+    arrivals
+    .dropna(subset=["observed_headway_sec"])
+    .groupby(group_keys)["observed_headway_sec"]
+    .median()
+)</pre>
+  <div class="callout"><strong>Why hourly:</strong> trains run every 4 min at rush hour but every 12 min at midnight. A 10-minute gap is normal at 1 AM and a delay at 8 AM. A global median would label every off-peak gap as a "delay" — exactly the bug that pushed the early delay rate up to 37%.</div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Step 4 · Apply two filters</h3>
+  <p>A train is labeled <code class="inline">delayed = 1</code> only when both conditions hold:</p>
+<pre>threshold_sec = 2 * 60  # DELAY_THRESHOLD_MINUTES from config
+
+is_phantom = observed_headway > 2 * median_headway
+
+is_delayed = (
+    (observed_headway > median_headway + threshold_sec)
+    &amp; ~is_phantom
+)</pre>
+  <ul class="tight">
+    <li><strong>Threshold filter:</strong> the gap must exceed the median by at least 2 minutes.</li>
+    <li><strong>Phantom filter:</strong> if the gap is more than 2× the median, it's almost certainly a missed arrival between polls (a train arrived <em>and</em> left in the 2-minute polling blind spot), not a real delay.</li>
+  </ul>
+</div>
+
+<h3>Step 5 · Propagate labels back to all prediction rows</h3>
+<p>Arrivals are sparse (a few per station per hour). Predictions are dense (one every 2 min). <code class="inline">merge_asof</code> attaches each arrival's delay label forward in time to the prediction rows that led up to it.</p>
+
+<pre>df = pd.merge_asof(
+    df,
+    delay_map,
+    left_on="collected_at",
+    right_on="arrival_at",
+    by=["location_code", "line", "group_num"],
+    direction="forward",       ← look forward to the next arrival
+    tolerance=pd.Timedelta("15min"),
+)</pre>
+
+<div class="why">
+<strong>The result:</strong> every prediction row now carries the label of "what eventually happened next at this station / line / direction." That is the supervised target the model learns to predict.
+</div>
+
+<hr>
+
+<h2>Recap: how 10M rows become a CSV the model can eat</h2>
+<div class="flow">
+  <div class="flow-box collect"><div class="lbl">poll</div><div class="val">API → JSON</div></div>
+  <div class="arrow">→</div>
+  <div class="flow-box store"><div class="lbl">store</div><div class="val">SQLite append</div></div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform"><div class="lbl">sync</div><div class="val">VM → laptop</div></div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform"><div class="lbl">label</div><div class="val">headway logic</div></div>
+  <div class="arrow">→</div>
+  <div class="flow-box transform"><div class="lbl">join</div><div class="val">+ 18 features</div></div>
+  <div class="arrow">→</div>
+  <div class="flow-box model"><div class="lbl">train</div><div class="val">CatBoost</div></div>
+</div>
+
+<p style="margin-top:32px;color:var(--muted);font-size:13px;text-align:center">
+End of walkthrough · open <code class="inline">scripts/build_features.py</code> alongside Layer 7 for the full picture.
+</p>
+
+</div>
+</body>
+</html>

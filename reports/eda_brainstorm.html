@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Lluvia de ideas EDA — WMATA</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --panel: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e5e5e0;
+    --accent: #c0392b;
+    --A: #2c5f8d; /* operacional */
+    --B: #5a7a3a; /* temporal    */
+    --C: #c0392b; /* causal      */
+    --D: #6d3a8d; /* red         */
+    --E: #b8721c; /* pasajero    */
+    --F: #1f7a6d; /* comparativo */
+    --code-bg: #f4f3ee;
+    --hi: #fff8e1;
+    --med: #f4f6f0;
+    --low: #f7f7f4;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+  header {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+  header .eyebrow {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 34px;
+    margin: 0 0 8px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  header .sub {
+    color: var(--muted);
+    margin: 4px 0 0;
+    font-size: 15px;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 56px 0 8px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    padding-left: 12px;
+    border-left: 4px solid currentColor;
+  }
+  h2.A { color: var(--A); }
+  h2.B { color: var(--B); }
+  h2.C { color: var(--C); }
+  h2.D { color: var(--D); }
+  h2.E { color: var(--E); }
+  h2.F { color: var(--F); }
+  h2 .num {
+    color: var(--muted);
+    font-weight: 500;
+    margin-right: 8px;
+  }
+  h3 {
+    font-size: 16px;
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+  p { margin: 0 0 12px; }
+
+  .lens-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  /* Intro card */
+  .intro {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+  .intro h3 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-top: 16px;
+  }
+  .intro h3:first-child { margin-top: 0; }
+  .intro ul { margin: 0 0 8px; padding-left: 22px; }
+  .intro li { margin: 3px 0; font-size: 14px; }
+
+  /* Lens summary */
+  .lens-summary {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 16px;
+    padding-left: 16px;
+  }
+
+  /* Cards grid */
+  .ideas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 760px) {
+    .ideas { grid-template-columns: 1fr; }
+    .wrap { padding: 32px 18px 56px; }
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 18px;
+    position: relative;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  .card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .card.hi { background: var(--hi); border-color: #f0d97a; }
+  .card.med { background: var(--med); }
+  .card.low { background: var(--low); }
+
+  .card .priority {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .priority.hi { background: #c0392b; color: white; }
+  .priority.med { background: #5a7a3a; color: white; }
+  .priority.low { background: #888; color: white; }
+
+  .card p {
+    font-size: 13.5px;
+    color: var(--ink);
+    margin: 0 0 6px;
+  }
+  .card .why {
+    font-size: 12.5px;
+    color: var(--muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* Spine */
+  .spine {
+    background: linear-gradient(135deg, #fff 0%, #fef9f2 100%);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin: 56px 0 40px;
+  }
+  .spine h2 {
+    border: none;
+    padding: 0;
+    margin: 0 0 12px;
+    color: var(--accent);
+    font-size: 20px;
+  }
+  .spine .lede {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .spine ol {
+    margin: 0;
+    padding-left: 24px;
+    counter-reset: spine;
+    list-style: none;
+  }
+  .spine ol li {
+    counter-increment: spine;
+    position: relative;
+    padding-left: 32px;
+    margin: 8px 0;
+    font-size: 14.5px;
+  }
+  .spine ol li::before {
+    content: counter(spine);
+    position: absolute;
+    left: -8px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .spine .lens-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+    color: white;
+  }
+  .lens-pill.A { background: var(--A); }
+  .lens-pill.B { background: var(--B); }
+  .lens-pill.C { background: var(--C); }
+  .lens-pill.D { background: var(--D); }
+  .lens-pill.E { background: var(--E); }
+  .lens-pill.F { background: var(--F); }
+
+  /* Discussion questions */
+  .discuss {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-top: 32px;
+  }
+  .discuss h2 {
+    border: none;
+    padding: 0;
+    margin: 0 0 16px;
+    font-size: 18px;
+    color: var(--ink);
+  }
+  .discuss ol {
+    margin: 0;
+    padding-left: 22px;
+  }
+  .discuss li {
+    margin: 8px 0;
+    font-size: 14.5px;
+  }
+
+  /* Heads-up box */
+  .heads-up {
+    background: #fef3e2;
+    border-left: 3px solid #b8721c;
+    padding: 12px 18px;
+    border-radius: 4px;
+    margin: 16px 0;
+    font-size: 13.5px;
+    color: #6b4a14;
+  }
+  .heads-up strong { color: #b8721c; }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+  .legend .item .swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12.5px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">ENAI 603 · Primavera 2026 · Para discusión en equipo</div>
+  <h1>Lluvia de ideas EDA: visualizaciones y preguntas</h1>
+  <p class="sub">Un menú de ~25 ideas a través de seis perspectivas, después del giro del taller hacia mayor profundidad en EDA y menos énfasis en predicción.</p>
+</header>
+
+<div class="intro">
+  <h3>Conclusión del taller</h3>
+  <p style="font-size:14px;margin-bottom:12px">El profesor quiere que nos enfoquemos más en el EDA: contar una historia más clara, mostrar más visualizaciones, hacer preguntas más profundas. La predicción sigue al final como destino, pero el camino es lo que importa.</p>
+
+  <h3>Lo que 02_eda.ipynb ya cubre</h3>
+  <ul>
+    <li>Balance de clases, valores faltantes</li>
+    <li>Tasa de retraso por línea · por hora · hora pico vs valle</li>
+    <li>Top/bottom 15 estaciones</li>
+    <li>Mapa de calor línea × hora</li>
+    <li>Distribuciones de variables en tiempo real y rolling</li>
+    <li>Incidente activo vs ninguno</li>
+    <li>Matriz de correlación</li>
+  </ul>
+
+  <h3>Seis perspectivas, en orden de prioridad</h3>
+  <div class="legend">
+    <div class="item"><span class="swatch" style="background:var(--A)"></span>A · Operacional</div>
+    <div class="item"><span class="swatch" style="background:var(--B)"></span>B · Temporal</div>
+    <div class="item"><span class="swatch" style="background:var(--C)"></span>C · Causal</div>
+    <div class="item"><span class="swatch" style="background:var(--D)"></span>D · Red</div>
+    <div class="item"><span class="swatch" style="background:var(--E)"></span>E · Pasajero</div>
+    <div class="item"><span class="swatch" style="background:var(--F)"></span>F · Comparativo</div>
+  </div>
+</div>
+
+<!-- ════════ A. OPERACIONAL ════════ -->
+<h2 class="A"><span class="num">A.</span>Operacional — ¿quién es el peor?</h2>
+<p class="lens-summary">Rankings, puntos críticos, tablas de líderes. La vista de "dónde apuntar el dedo".</p>
+
+<div class="ideas">
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Mapa geográfico de retrasos</h3>
+    <p>102 estaciones graficadas en lat/lon. Color = tasa de retraso, tamaño = volumen.</p>
+    <p class="why">Un solo gráfico que abre toda la historia. Ya tenemos lat/lon en la tabla de estaciones.</p>
+  </div>
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Peores celdas (línea × hora)</h3>
+    <p>Extraer las top 10 combinaciones línea-hora del mapa de calor existente como una barra rankeada.</p>
+    <p class="why">Concreto, accionable. Convierte un heatmap en una recomendación.</p>
+  </div>
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Estaciones "peores" ponderadas por volumen</h3>
+    <p>Estaciones rankeadas por <em>trenes retrasados × volumen</em>, no solo por tasa.</p>
+    <p class="why">"Tasa vs dolor" — responde dónde está el mayor impacto al pasajero, no solo el % más alto.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>La dirección importa</h3>
+    <p>Dividir la tasa de retraso de cada línea por <code>group_num</code> (1 vs 2).</p>
+    <p class="why">Frecuentemente una dirección es sistemáticamente peor. Victoria fácil.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Peores días individuales</h3>
+    <p>Tasa de retraso diaria durante las 5 semanas; anotar los 3 peores.</p>
+    <p class="why">Prepara el caso de estudio de incidentes (perspectiva C).</p>
+  </div>
+</div>
+
+<!-- ════════ B. TEMPORAL ════════ -->
+<h2 class="B"><span class="num">B.</span>Temporal — ¿cuándo?</h2>
+<p class="lens-summary">Hora, día, semana, temporada. La vista del "ritmo del sistema".</p>
+
+<div class="ideas">
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Mapa de calor hora × día de la semana</h3>
+    <p>Cuadrícula completa 24×7, coloreada por tasa de retraso.</p>
+    <p class="why">Profundiza más que línea×hora. Revela patrones de fin de semana que actualmente no vemos.</p>
+  </div>
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Línea de tiempo de 5 semanas</h3>
+    <p>Tasa de retraso diaria como gráfico de línea con la franja de hora pico sombreada; anotar días notables.</p>
+    <p class="why">Añade la narrativa temporal que actualmente le falta al proyecto. Ancla de la historia.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Distribuciones de headways</h3>
+    <p>Histograma de <code>observed_headway_sec</code> por línea.</p>
+    <p class="why">Muestra la <em>forma</em> de la calidad del servicio, no solo un binario retrasado/no.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Servicio nocturno</h3>
+    <p>Análisis separado para 9PM hasta cierre. Los trenes corren menos seguido; ¿se acumulan los retrasos?</p>
+    <p class="why">El horario valle es su propio mundo; merece su propio gráfico.</p>
+  </div>
+  <div class="card low">
+    <span class="priority low">Crédito extra</span>
+    <h3>Spring break vs semanas normales</h3>
+    <p>Los datos cubren del 11 de marzo al 17 de abril. Spring break es del 16 al 22 de marzo.</p>
+    <p class="why">Diferente nivel de pasajeros. Comparación A/B natural.</p>
+  </div>
+</div>
+
+<!-- ════════ C. CAUSAL ════════ -->
+<h2 class="C"><span class="num">C.</span>Causal — ¿por qué?</h2>
+<p class="lens-summary">Conectar incidentes con retrasos. La perspectiva más interesante académicamente.</p>
+
+<div class="ideas">
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Estudio de evento alrededor de incidentes</h3>
+    <p>Para cada incidente tipo "Delay", graficar la tasa de retraso en la línea afectada ±60 min.</p>
+    <p class="why">El gráfico analíticamente más interesante que podemos hacer. Muestra si los incidentes <em>causan</em> retrasos medibles.</p>
+  </div>
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Ranking de tipos de incidente</h3>
+    <p>Agrupar <code>incident_type</code> + palabras clave de descripción (single tracking, mecánico, señal, clima…) y rankear por impacto en retrasos.</p>
+    <p class="why">Convierte texto desordenado en un ranking limpio. Relevante al dominio.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Tasa de retraso sin incidente</h3>
+    <p>¿Qué % de retrasos ocurren sin un incidente activo?</p>
+    <p class="why">Hallazgo de calidad del servicio: "X% de los retrasos no son reportados por WMATA". Provocador.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Tiempo de recuperación</h3>
+    <p>Después de que un incidente se resuelve, ¿cuántos minutos hasta que la tasa de retraso vuelve a la línea base?</p>
+    <p class="why">Métrica por tipo de incidente. Útil para la conclusión.</p>
+  </div>
+  <div class="card low">
+    <span class="priority low">Crédito extra</span>
+    <h3>Análisis profundo de un solo incidente</h3>
+    <p>Elegir un incidente grande (peor día de la perspectiva A), mostrar la propagación a través de estaciones como serie de tiempo.</p>
+    <p class="why">Una página de "caso de estudio WMATA". Oro narrativo.</p>
+  </div>
+</div>
+
+<!-- ════════ D. RED ════════ -->
+<h2 class="D"><span class="num">D.</span>Red — cómo se propagan los retrasos</h2>
+<p class="lens-summary">Topología, transferencias, propagación. Trata a WMATA como un grafo.</p>
+
+<div class="ideas">
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Mapa con superposición de red</h3>
+    <p>Extender el mapa de red del notebook 21. Colorear estaciones por tasa de retraso, dibujar bordes de líneas.</p>
+    <p class="why">Construye sobre trabajo existente. Versión más fuerte del mapa geográfico de A.</p>
+  </div>
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Efecto de estación de transferencia</h3>
+    <p>Usando <code>together_station</code>, comparar tasas de retraso en estaciones de transferencia vs de línea única.</p>
+    <p class="why">Hipótesis: las transferencias concentran retrasos. Comprobable, visual, novedoso.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Autocorrelación espacial</h3>
+    <p>¿Un retraso en la estación N correlaciona con un retraso en la estación N+1 en los siguientes 10 min?</p>
+    <p class="why">Cuantifica la propagación. Sienta las bases para "cascadas de retrasos".</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Líneas con vías compartidas</h3>
+    <p>Yellow+Green y Blue+Orange+Silver comparten vías. ¿Sus tasas de retraso correlacionan?</p>
+    <p class="why">Insight específico al dominio; le enseña al lector algo sobre la infraestructura de WMATA.</p>
+  </div>
+  <div class="card low">
+    <span class="priority low">Crédito extra</span>
+    <h3>Terminal vs interior</h3>
+    <p><code>is_terminal</code> ya es una variable. Comparar tasas de retraso.</p>
+    <p class="why">Victoria rápida, pero probablemente efecto pequeño.</p>
+  </div>
+</div>
+
+<!-- ════════ E. PASAJERO ════════ -->
+<h2 class="E"><span class="num">E.</span>Pasajero — cómo se siente</h2>
+<p class="lens-summary">Reformular en términos humanos. La perspectiva del "elevator pitch".</p>
+
+<div class="ideas">
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>"Tu viaje matutino"</h3>
+    <p>Elegir 3-5 rutas representativas (Shady Grove → Metro Center, Vienna → Foggy Bottom). Para cada una: % de viajes AM entre semana retrasados, retraso promedio, peor día.</p>
+    <p class="why">Concreto, humano, memorable. Podría ser la conclusión del reporte.</p>
+  </div>
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Minutos perdidos</h3>
+    <p>Convertir la etiqueta binaria a minutos añadidos estimados (usar <code>observed_headway − median_headway</code>). Sumarlo todo.</p>
+    <p class="why">"Los pasajeros perdieron colectivamente ~X minutos durante nuestra ventana de 5 semanas." Número titular.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Calendario de confiabilidad</h3>
+    <p>Cuadrícula 5×7 de días, cada celda verde/amarilla/roja según la tasa de retraso del sistema.</p>
+    <p class="why">Como un gráfico de contribuciones de GitHub. Visualmente impactante.</p>
+  </div>
+  <div class="card low">
+    <span class="priority low">Crédito extra</span>
+    <h3>Peor día para el pasajero</h3>
+    <p>Elegir el peor día AM entre semana en la ventana y contar la historia.</p>
+    <p class="why">Recompensa narrativa. Se empareja con el caso de estudio de C.</p>
+  </div>
+</div>
+
+<!-- ════════ F. COMPARATIVO ════════ -->
+<h2 class="F"><span class="num">F.</span>Comparativo — ¿cumplen su promesa?</h2>
+<p class="lens-summary">Comparar la realidad con el horario publicado. Defensible, reportable.</p>
+
+<div class="ideas">
+  <div class="card hi">
+    <span class="priority hi">Alto impacto</span>
+    <h3>Headway observado vs programado</h3>
+    <p>Gráfico de dispersión. Cada punto un (estación, hora). Diagonal = adherencia perfecta.</p>
+    <p class="why">Usa la variable GTFS que ya construimos. Visual, inmediato.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>% de puntualidad</h3>
+    <p>Por línea, según definición formal (dentro de X minutos del horario).</p>
+    <p class="why">WMATA publica su propio número. Podemos calcular uno independiente y comparar.</p>
+  </div>
+  <div class="card med">
+    <span class="priority med">Medio</span>
+    <h3>Dónde la brecha es más amplia</h3>
+    <p>Top 10 celdas (estación, hora) donde lo observado vs programado más diverge.</p>
+    <p class="why">"¿Dónde se queda WMATA más atrás de su propia promesa?"</p>
+  </div>
+  <div class="card low">
+    <span class="priority low">Crédito extra</span>
+    <h3>Puntaje de calidad de servicio</h3>
+    <p>Compuesto por línea: % puntualidad + cantidad de incidentes + tiempo de recuperación.</p>
+    <p class="why">Ranking defensible de un solo número. Riesgoso si se cuestiona.</p>
+  </div>
+</div>
+
+<div class="heads-up">
+  <strong>Advertencia para la perspectiva F:</strong> la variable <code>scheduled_headway_min</code> derivada de GTFS tiene ~53% de valores faltantes (desajuste de mapeo de dirección, marcado en 02_eda). Vale la pena arreglarlo antes de apoyarse en esta perspectiva.
+</div>
+
+<!-- ════════ COLUMNA VERTEBRAL ════════ -->
+<div class="spine">
+  <h2>Columna vertebral recomendada — si solo construimos 8</h2>
+  <p class="lede">Un arco narrativo completo de "dónde" a "cuándo" a "por qué" a "cómo se siente".</p>
+  <ol>
+    <li>Mapa geográfico de retrasos <span class="lens-pill A">A</span> — abre la historia</li>
+    <li>Estaciones peores ponderadas por volumen <span class="lens-pill A">A</span> — tasa vs dolor</li>
+    <li>Mapa de calor hora × día de la semana <span class="lens-pill B">B</span> — cuándo</li>
+    <li>Línea de tiempo de 5 semanas con anotaciones <span class="lens-pill B">B</span> — arco narrativo</li>
+    <li>Estudio de evento alrededor de incidentes <span class="lens-pill C">C</span> — pieza analítica central</li>
+    <li>Hallazgo de retraso sin incidente <span class="lens-pill C">C</span> — ángulo de calidad de servicio</li>
+    <li>Efecto de estación de transferencia <span class="lens-pill D">D</span> — insight de red</li>
+    <li>"Tu viaje matutino" + minutos perdidos <span class="lens-pill E">E</span> — encuadre humano</li>
+  </ol>
+</div>
+
+<!-- ════════ DISCUSIÓN ════════ -->
+<div class="discuss">
+  <h2>Preguntas de discusión para el equipo</h2>
+  <ol>
+    <li>De las ideas de <strong>alto impacto (rojas)</strong>, ¿hay alguna que queramos <em>descartar</em>?</li>
+    <li>¿Alguna idea <strong>media o de crédito extra</strong> que queramos <em>promover</em>?</li>
+    <li>¿Dónde vive esto — extender <code>02_eda.ipynb</code>, nuevo notebook (ej. <code>04_eda_deep.ipynb</code>), o reporte HTML?</li>
+    <li>¿Quién toma cuál perspectiva? (A y D son visuales; C es analítica; E es de mucha escritura.)</li>
+    <li>¿Atacamos el arreglo de mapeo de dirección de GTFS para que la perspectiva F esté disponible?</li>
+    <li>Presupuesto realista: ¿cuántas de las 25 ideas podemos construir antes de la fecha límite?</li>
+  </ol>
+</div>
+
+<footer>
+  Proyecto WMATA Delays · ENAI 603 · Andres, Felipe, Selena
+</footer>
+
+</div>
+</body>
+</html>
